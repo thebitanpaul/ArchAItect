@@ -1,0 +1,85 @@
+# Frontend
+/frontend/node_modules/
+/frontend/dist/
+/frontend/build/
+/frontend/.turbo/
+/frontend/.vite/
+/frontend/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*
+/frontend/pnpm-debug.log*
+/frontend/.env
+/frontend/.env.*
+/frontend/*.log
+
+# Backend
+/backend/.venv/
+/backend/venv/
+/backend/env/
+/backend/ENV/
+/backend/env.bak/
+/backend/venv.bak/
+/backend/pip-wheel-metadata/
+/backend/__pycache__/
+/backend/*.py[cod]
+/backend/*.pyo
+/backend/*.pyd
+/backend/*.pyc
+/backend/.pytest_cache/
+/backend/pytest_cache/
+/backend/.mypy_cache/
+/backend/.pyre/
+/backend/.pytype/
+/backend/htmlcov/
+/backend/.coverage
+/backend/.coverage.*
+/backend/.cache
+/backend/nosetests.xml
+/backend/.env
+/backend/.env.*
+
+# Shared
+node_modules/
+*.log
+.env
+.env.*
+*.local
+
+# IDE / editor files
+.vscode/
+.idea/
+*.iml
+*.sublime-workspace
+*.sublime-project
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+
+
+# Python
+/backend/.ruff_cache/
+/backend/.tox/
+/backend/.hypothesis/
+
+# FastAPI / uvicorn
+/backend/*.db
+/backend/*.sqlite
+/backend/*.sqlite3
+
+# Mac / Linux
+.AppleDouble
+.LSOverride
+
+# Frontend
+/frontend/.next/
+/frontend/.nuxt/
+/frontend/coverage/
+
+# General
+coverage/
+dist/
+build/
