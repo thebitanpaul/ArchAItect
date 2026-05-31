@@ -74,7 +74,7 @@ export default function App() {
 
   useEffect(() => {
     let alive = true;
-    fetch("http://localhost:8000/api/health")
+    fetch(`${import.meta.env.VITE_API_BASE ?? "http://localhost:8000"}/api/health`)
       .then((r) => (r.ok ? setBackend("online") : setBackend("offline")))
       .catch(() => alive && setBackend("offline"));
     return () => { alive = false; };
@@ -506,7 +506,7 @@ export default function App() {
       {/* ---------- COPYRIGHT FOOTER ---------- */}
       <footer className="border-t py-5 text-center" style={{ borderColor: "var(--line)" }}>
         <span className="font-mono text-[11px]" style={{ color: "var(--ink-faint)" }}>
-          2026 | © phiUture | All Rights Reserved
+          2026 | © Navikenz | All Rights Reserved
         </span>
       </footer>
 
