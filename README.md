@@ -1,9 +1,8 @@
+<div align="center">
 
-# 🏛️ ArchAItect 
+# 🏛️ ArchAItect
 
 ### Shape your business with AI
-
-<div align="center">
 
 [![Live Demo](https://img.shields.io/badge/Live%20App-Open%20in%20Vercel-blue?style=for-the-badge&logo=vercel)](https://archaitect-ten.vercel.app)
 
@@ -19,7 +18,7 @@
 
 https://github.com/user-attachments/assets/20b3656f-5844-4289-9700-e4c1c3e3f12a
 
-_A full walkthrough of ArchAItect — from requirements document to a stress-tested microservice architecture._
+*A full walkthrough of ArchAItect — from requirements document to a stress-tested microservice architecture.*
 
 </div>
 
@@ -55,7 +54,7 @@ The guiding principle is **logic over LLM wherever possible**. Most of the heavy
 - **Software architects & senior engineers** — to get a fast, structured first draft of a decomposition and stress-test their own designs.
 - **Engineering teams & tech leads** — to align on service boundaries and migration sequencing from a shared, visual reference.
 - **Product & pre-sales teams** — to translate a client's requirements into a credible technical proposal, complete with how comparable companies architect similar systems.
-- **Students & learners** — to _see_ Domain-Driven Design, coupling/cohesion, and resilience concepts applied to a real spec, each explained inline.
+- **Students & learners** — to *see* Domain-Driven Design, coupling/cohesion, and resilience concepts applied to a real spec, each explained inline.
 
 You do **not** need to be a microservices expert to use it — every metric and term has an in-app "ℹ️" explanation describing what it means and exactly how it's computed.
 
@@ -65,15 +64,15 @@ You do **not** need to be a microservices expert to use it — every metric and 
 
 After you paste or upload a requirements document, ArchAItect generates:
 
-| Output                      | What it is                                                                                                                              | How it's computed                               |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| **Service Map**             | An interactive graph of the proposed microservices and their dependencies (sync vs async).                                              | 3 LLM calls (domain → decompose → dependencies) |
-| **Resilience Simulator**    | Hover any service to simulate its failure; the map highlights the downstream "blast radius". Flags single points of failure.            | Pure Python (graph traversal) — 0 tokens        |
-| **Architecture Metrics**    | Cohesion, coupling looseness, scalability, business-boundary quality, and a Domain-Driven Design view, per service.                     | Pure Python (graph formulas) — 0 tokens         |
-| **Risk Audit**              | A senior-architect-style critique: God services, chatty sync chains, single points of failure, with a health score and fix suggestions. | 1 LLM call (on demand)                          |
-| **Traceability Matrix**     | Maps every requirement from the document to the service(s) that satisfy it; surfaces coverage gaps.                                     | 1 LLM call (on demand)                          |
-| **Migration Roadmap**       | A phased, strangler-fig delivery plan ordered by the dependency graph.                                                                  | 1 LLM call (on demand)                          |
-| **Competitor Intelligence** | How a real company in the same domain is actually architected, using live web search.                                                   | 1 grounded LLM call (on demand)                 |
+| Output | What it is | How it's computed |
+|---|---|---|
+| **Service Map** | An interactive graph of the proposed microservices and their dependencies (sync vs async). | 3 LLM calls (domain → decompose → dependencies) |
+| **Resilience Simulator** | Hover any service to simulate its failure; the map highlights the downstream "blast radius". Flags single points of failure. | Pure Python (graph traversal) — 0 tokens |
+| **Architecture Metrics** | Cohesion, coupling looseness, scalability, business-boundary quality, and a Domain-Driven Design view, per service. | Pure Python (graph formulas) — 0 tokens |
+| **Risk Audit** | A senior-architect-style critique: God services, chatty sync chains, single points of failure, with a health score and fix suggestions. | 1 LLM call (on demand) |
+| **Traceability Matrix** | Maps every requirement from the document to the service(s) that satisfy it; surfaces coverage gaps. | 1 LLM call (on demand) |
+| **Migration Roadmap** | A phased, strangler-fig delivery plan ordered by the dependency graph. | 1 LLM call (on demand) |
+| **Competitor Intelligence** | How a real company in the same domain is actually architected, using live web search. | 1 grounded LLM call (on demand) |
 
 You can **edit the architecture by hand** at any point — add, rename, or delete services, wire new dependencies (and toggle them sync/async), change data stores, and add external integrations (payment gateways, auth providers, etc.). Editing is **free** (no tokens): the resilience and metrics recompute instantly in Python.
 
@@ -105,10 +104,9 @@ The pipeline is deliberately staged so that **the expensive steps run last and o
         └─────────────────────────────────────────────────────────────┘
 ```
 
-**Step 1 — Document compression (no AI).** Before a single token is spent, `preprocess.py` runs classic extractive summarization: it strips boilerplate (page numbers, tables of contents, legal/version headers), scores every sentence and heading by "requirement signal" (requirement keywords like _shall/must/manage_, domain nouns, structural cues), deduplicates, and keeps the densest content up to a character budget. A 250 KB document becomes a tight digest — and that digest is the _only_ raw document text any model ever sees.
+**Step 1 — Document compression (no AI).** Before a single token is spent, `preprocess.py` runs classic extractive summarization: it strips boilerplate (page numbers, tables of contents, legal/version headers), scores every sentence and heading by "requirement signal" (requirement keywords like *shall/must/manage*, domain nouns, structural cues), deduplicates, and keeps the densest content up to a character budget. A 250 KB document becomes a tight digest — and that digest is the *only* raw document text any model ever sees.
 
 **Step 2 — The required agents.** The digest flows through three focused agents, each a single LLM call returning strict JSON:
-
 - **Domain agent** — extracts actors, entities, and functional areas.
 - **Decompose agent** — proposes services with bounded contexts, responsibilities, data stores, and external integrations (applying polyglot persistence so stores genuinely vary).
 - **Dependency agent** — maps the edges between services (synchronous REST vs asynchronous events).
@@ -130,14 +128,13 @@ This project treats LLM tokens as a scarce resource and is engineered around min
 - **Token-free editing.** Manual edits recompute resilience and metrics in Python; no model call.
 - **Single grounded call** for competitor intel (search + structured output in one round trip).
 
-> **The one-line pitch:** _We don't blindly stuff documents into an LLM. We pre-process in pure Python and send only the distilled signal, then use the model surgically — only where reasoning is genuinely needed, and only on demand._
+> **The one-line pitch:** *We don't blindly stuff documents into an LLM. We pre-process in pure Python and send only the distilled signal, then use the model surgically — only where reasoning is genuinely needed, and only on demand.*
 
 ---
 
 ## Architecture & tech stack
 
 **Frontend** — a static single-page app:
-
 - React + Vite + TypeScript
 - Tailwind CSS + shadcn/ui
 - React Flow (`@xyflow/react`) for the interactive service map
@@ -145,7 +142,6 @@ This project treats LLM tokens as a scarce resource and is engineered around min
 - lucide-react for icons
 
 **Backend** — a stateless HTTP API:
-
 - Python + FastAPI (with Server-Sent Events for streaming the pipeline)
 - Google Gemini via the `google-genai` SDK (free tier; web-search grounding)
 - pypdf for document text extraction
@@ -189,7 +185,6 @@ ArchAItect/
 ## Running it locally
 
 ### Prerequisites
-
 - **Node.js** 18+ and **Python** 3.10+
 - A **free Google Gemini API key** — get one (no credit card) at <https://aistudio.google.com/apikey>
 
@@ -258,7 +253,6 @@ ArchAItect is **two pieces with different needs**, so the honest answer is a **s
 ### Recommended free setup
 
 **Backend → [Render](https://render.com) free web service** (or Railway / Fly.io):
-
 1. Push this repo to GitHub.
 2. On Render: **New → Web Service**, point it at your repo, root directory `backend`.
 3. Build command: `pip install -r requirements.txt`
@@ -269,7 +263,6 @@ ArchAItect is **two pieces with different needs**, so the honest answer is a **s
 > Free instances sleep when idle, so the **first request after a pause takes ~30–60s to wake**. Fine for a demo; mention it if you're presenting live.
 
 **Frontend → [Vercel](https://vercel.com) or [Netlify](https://netlify.com) free tier** (recommended over GitHub Pages because env vars and SPA routing are easier):
-
 1. **New Project**, import the repo, set the root directory to `frontend`.
 2. Framework preset: **Vite**. Build: `npm run build`. Output: `dist`.
 3. Add an environment variable **`VITE_API_BASE`** = your Render backend URL.
@@ -277,18 +270,18 @@ ArchAItect is **two pieces with different needs**, so the honest answer is a **s
 
 ### Can I use GitHub Pages?
 
-You _can_ host the **frontend** on GitHub Pages (build with `npm run build`, publish the `dist/` folder, and set `VITE_API_BASE` at build time), but you **still need a separate backend host** for the Python API and key. So Pages can be the frontend half of the split — it just can't be the whole thing.
+You *can* host the **frontend** on GitHub Pages (build with `npm run build`, publish the `dist/` folder, and set `VITE_API_BASE` at build time), but you **still need a separate backend host** for the Python API and key. So Pages can be the frontend half of the split — it just can't be the whole thing.
 
 ### Configuration knobs that make deployment work
 
 These are already wired in so the same code runs locally and in production:
 
-| Where          | Variable                   | Purpose                                                                        |
-| -------------- | -------------------------- | ------------------------------------------------------------------------------ |
-| Frontend build | `VITE_API_BASE`            | Points the app at your deployed backend (defaults to `http://localhost:8000`). |
-| Backend env    | `GEMINI_API_KEY`           | Your model key (kept server-side, never shipped to the browser).               |
-| Backend env    | `CORS_ORIGINS`             | Comma-separated list of allowed frontend origins.                              |
-| Backend env    | `MODEL` / `FALLBACK_MODEL` | Which Gemini models to use.                                                    |
+| Where | Variable | Purpose |
+|---|---|---|
+| Frontend build | `VITE_API_BASE` | Points the app at your deployed backend (defaults to `http://localhost:8000`). |
+| Backend env | `GEMINI_API_KEY` | Your model key (kept server-side, never shipped to the browser). |
+| Backend env | `CORS_ORIGINS` | Comma-separated list of allowed frontend origins. |
+| Backend env | `MODEL` / `FALLBACK_MODEL` | Which Gemini models to use. |
 
 ---
 
@@ -299,7 +292,7 @@ These are already wired in so the same code runs locally and in production:
 - **Functional area** — a capability bucket (e.g. Ordering, Payments).
 - **Bounded context** — a self-contained business zone that one service owns (Domain-Driven Design).
 - **Responsibility** — the single job a service does.
-- **Sync (REST)** — a service calls another and _waits_ for the reply (like a phone call).
+- **Sync (REST)** — a service calls another and *waits* for the reply (like a phone call).
 - **Async (events)** — a service fires an event and moves on; others react later (like a text message).
 - **Cohesion** — how focused a service is on one job.
 - **Coupling** — how dependent services are on one another (fan-in = who depends on it; fan-out = what it depends on).
@@ -328,10 +321,10 @@ See the LICENSE file for full license text.
 I am an AI Specialist and Data Engineer at Navikenz and an Android Developer passionate about building intelligent, user-centric applications.
 Both Machine Learning and Android Development fascinate me, and I’ve also worked on AWS & Azure Cloud CI/CD & deployments.
 
-To know more about me, just Google `“Bitan Paul”.`
+To know more about me, just Google ```“Bitan Paul”.```
+
 
 ## 🔗 Links
-
 [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://instagram.com/thebitanpaul)
 [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/thebitanpaul)
 [![twitter](https://img.shields.io/badge/twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/thebitanpaul_)
