@@ -2,11 +2,7 @@ import type {
   Architecture, StepEvent, Review, Roadmap, Competitor, Resilience, Edge, Service, Metrics, Traceability,
 } from "@/types/architecture";
 
-// Backend base URL. In production set VITE_API_BASE (e.g. your Render URL);
-// falls back to localhost for local development.
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
-
-export { API_BASE };
+const API_BASE = "http://localhost:8000";
 
 export async function extractText(file: File): Promise<string> {
   const form = new FormData();

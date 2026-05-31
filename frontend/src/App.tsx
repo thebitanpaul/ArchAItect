@@ -74,7 +74,7 @@ export default function App() {
 
   useEffect(() => {
     let alive = true;
-    fetch(`${import.meta.env.VITE_API_BASE ?? "http://localhost:8000"}/api/health`)
+    fetch("http://localhost:8000/api/health")
       .then((r) => (r.ok ? setBackend("online") : setBackend("offline")))
       .catch(() => alive && setBackend("offline"));
     return () => { alive = false; };
