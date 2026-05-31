@@ -51,7 +51,7 @@ The guiding principle is **logic over LLM wherever possible**. Most of the heavy
 
 ## Who is this for?
 
-- **Software architects & senior engineers** — to get a fast, structured first draft of a decomposition and stress-test their own designs.
+- **Software architects & senior engineers** — to get a fast, structured first draft of a decomposition and stress-test their own designs
 - **Engineering teams & tech leads** — to align on service boundaries and migration sequencing from a shared, visual reference.
 - **Product & pre-sales teams** — to translate a client's requirements into a credible technical proposal, complete with how comparable companies architect similar systems.
 - **Students & learners** — to *see* Domain-Driven Design, coupling/cohesion, and resilience concepts applied to a real spec, each explained inline.
