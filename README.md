@@ -6,6 +6,8 @@
 
 [![Live Demo](https://img.shields.io/badge/Live%20App-Open%20in%20Vercel-blue?style=for-the-badge&logo=vercel)](https://archaitect-ten.vercel.app)
 
+<img alt="Hero Image" src="https://res.cloudinary.com/b0tb1mho/image/upload/v1784626188/q8vgomhungoglex9axyk.webp"/>
+
 **Turn a plain-English requirements document into a complete microservice architecture — a service map, an AI risk audit, a failure-resilience simulation, architecture metrics, a traceability matrix, a migration roadmap, and live competitor intelligence.**
 
 </div>
@@ -17,6 +19,16 @@
 <div align="center">
 
 https://github.com/user-attachments/assets/20b3656f-5844-4289-9700-e4c1c3e3f12a
+
+
+### Architecture Overview
+<img alt="Architecture Overview" src="https://res.cloudinary.com/b0tb1mho/image/upload/v1784579257/lad6w4g1ks2egche5luh.webp"/>
+
+### Cohesion · Coupling · Scalability · DDD
+<img alt="Cohesion · Coupling · Scalability · DDD" src="https://res.cloudinary.com/b0tb1mho/image/upload/v1784579254/ekgniehr6yzragge16kb.webp"/>
+
+### Generated Service Map
+<img alt="Generated Service Map" src="https://res.cloudinary.com/b0tb1mho/image/upload/v1784579260/ussn9x2puahejiybfqf9.webp"/>
 
 *A full walkthrough of ArchAItect — from requirements document to a stress-tested microservice architecture.*
 
