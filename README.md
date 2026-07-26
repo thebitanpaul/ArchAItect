@@ -328,12 +328,25 @@ These are already wired in so the same code runs locally and in production:
 This project is licensed under the [Apache-2.0](LICENSE).
 See the LICENSE file for full license text.
 
-## 🚀 About Me
+## About phiUture
 
-I am an AI Specialist and Data Engineer at Navikenz and an Android Developer passionate about building intelligent, user-centric applications.
-Both Machine Learning and Android Development fascinate me, and I’ve also worked on AWS & Azure Cloud CI/CD & deployments.
 
-To know more about me, just Google ```“Bitan Paul”.```
+Welcome to phiUture — Beautiful Technology. Centered Around You. Shaping Tomorrow.
+
+Inspired by the Golden Ratio (φ), our name represents beautiful, intelligent engineering, while the "U" stands for You—placing people at the center of every solution we build.
+
+phiUture is an AI-first software company creating intelligent products, automation systems, and modern digital experiences. This channel documents the journey of building practical AI solutions, from concept to deployment.
+
+```text
+Here you'll find:
+• AI applications and product demos
+• AI agents and automation workflows
+• Web and mobile app showcases
+• Machine Learning and Data Engineering projects
+• Product launches and development insights
+• UI/UX and software engineering content
+• Tutorials, experiments, and future innovations
+```
 
 | Personal | Business | Artist |
 |----------|----------|--------|
