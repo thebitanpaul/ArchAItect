@@ -25,6 +25,9 @@
 <img src="https://img.youtube.com/vi/fFKH_kVNXpQ/hqdefault.jpg" width="1080"/>
 </a>
 
+### Bring Your Own Key (BYO) with bank-grade security
+<img alt="Architecture Overview" src="https://res.cloudinary.com/b0tb1mho/image/upload/v1785179218/Screenshot_2026-07-28_at_12.36.34_AM.webp"/>
+
 ### Architecture Overview
 <img alt="Architecture Overview" src="https://res.cloudinary.com/b0tb1mho/image/upload/v1784579257/lad6w4g1ks2egche5luh.webp"/>
 
