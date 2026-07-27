@@ -1,12 +1,31 @@
 import type {
   Architecture, StepEvent, Review, Roadmap, Competitor, Resilience, Edge, Service, Metrics, Traceability,
 } from "@/types/architecture";
-
-// Backend base URL. In production set VITE_API_BASE (e.g. your Render URL);
-// falls back to localhost for local development.
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+import { API_BASE } from "@/lib/config";
+import { requestLlm, type LlmPayload } from "@/lib/llm";
 
 export { API_BASE };
+
+/**
+ * Every request that can spend tokens carries the engine credentials for the
+ * current session — either `{provider:"phiuture"}` for the shared free key, or the
+ * visitor's own provider + key read out of the browser vault. The key is a
+ * pass-through: the backend uses it for that one call and never stores it.
+ */
+async function withLlm<T extends object>(body: T): Promise<T & { llm: LlmPayload }> {
+  return { ...body, llm: await requestLlm() };
+}
+
+/** Pull the readable reason out of a FastAPI error response. */
+async function errorDetail(res: Response, fallback: string): Promise<string> {
+  try {
+    const json = await res.json();
+    if (typeof json?.detail === "string") return json.detail;
+  } catch {
+    /* not JSON */
+  }
+  return fallback;
+}
 
 export async function extractText(file: File): Promise<string> {
   const form = new FormData();
@@ -34,12 +53,13 @@ export async function analyzeStream(
   const res = await fetch(`${API_BASE}/api/analyze`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ document }),
+    body: JSON.stringify(await withLlm({ document })),
   });
 
   if (!res.ok || !res.body) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(`Analyze failed: ${res.status} ${detail}`);
+    // Credential and free-tier problems are rejected before the stream opens, so
+    // they arrive here as a normal JSON error with an actionable message.
+    throw new Error(await errorDetail(res, `Analyze failed: ${res.status}`));
   }
 
   const reader = res.body.getReader();
@@ -84,15 +104,14 @@ export async function analyzeStream(
 }
 
 /** On-demand analysis calls (simple JSON, not streaming). */
-async function postJson<T>(path: string, body: unknown): Promise<T> {
+async function postJson<T>(path: string, body: object): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify(await withLlm(body)),
   });
   if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(`${path} failed: ${res.status} ${detail}`);
+    throw new Error(await errorDetail(res, `${path} failed: ${res.status}`));
   }
   return res.json() as Promise<T>;
 }

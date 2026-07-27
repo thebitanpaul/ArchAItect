@@ -20,7 +20,7 @@
 /backend/env.bak/
 /backend/venv.bak/
 /backend/pip-wheel-metadata/
-/backend/__pycache__/
+__pycache__/
 /backend/*.py[cod]
 /backend/*.pyo
 /backend/*.pyd

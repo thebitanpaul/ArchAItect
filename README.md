@@ -43,6 +43,7 @@ https://github.com/user-attachments/assets/20b3656f-5844-4289-9700-e4c1c3e3f12a
 - [What it produces](#what-it-produces)
 - [How it works (the interesting part)](#how-it-works-the-interesting-part)
 - [The token-efficiency philosophy](#the-token-efficiency-philosophy)
+- [Bring your own key (BYO)](#bring-your-own-key-byo)
 - [Architecture & tech stack](#architecture--tech-stack)
 - [Project structure](#project-structure)
 - [Running it locally](#running-it-locally)
@@ -144,6 +145,69 @@ This project treats LLM tokens as a scarce resource and is engineered around min
 
 ---
 
+## Bring your own key (BYO)
+
+You can run the whole app on **your own LLM account**. Click the **engine pill** in the
+header (top right, the one showing `engine online`) and the engine dialog opens.
+
+**Two modes:**
+
+| Mode | What it is |
+|---|---|
+| **phiUture free** | A shared key hosted with the app — nothing to sign up for. Because it's shared, **availability depends on live traffic**: when it's saturated the pill turns amber and you're asked to add your own key. |
+| **Your own key** | Pick a provider, optionally pin a model, paste a key, click **Test key** to prove it works, then **Save & use**. Every analysis from then on runs through your account. |
+
+**Supported providers** — each one links straight to its key page from the dialog:
+
+| Provider | Free tier? | Live web search |
+|---|---|---|
+| Google Gemini | Yes, no card needed | ✅ Google Search grounding |
+| Anthropic Claude | No | ✅ web search tool |
+| OpenAI GPT | No | — |
+| AWS Bedrock (Claude / Nova / Llama) | No | — |
+| Groq | Yes, generous | — |
+| Mistral AI | Yes, experimental | — |
+| OpenRouter | Some free models | — |
+| xAI Grok | No | — |
+| DeepSeek | No | — |
+| Custom (OpenAI-compatible) | Ollama, vLLM, LM Studio, an internal gateway… | — |
+
+Providers without a search tool still produce Competitor Intelligence — the model is
+explicitly told it has no live lookup and to label its sources as public knowledge, so
+nothing is passed off as freshly researched.
+
+Model IDs move fast, so the model field is a free-text box with suggestions rather than a
+fixed list: type any model your account can reach and **Test key** tells you immediately
+whether it works.
+
+### How your key is kept safe
+
+- **Encrypted before storage.** The key is sealed with AES-256-GCM and kept in IndexedDB.
+- **The wrapping key can't be read out.** It's generated in your browser with
+  `extractable: false`, so the raw key material is never available to any script —
+  including ArchAItect's own. Nothing readable is ever written to `localStorage`.
+- **Nothing is stored server-side.** The backend uses the key for that one request and
+  discards it: no logs, no database, no disk. Secrets are also stripped out of provider
+  error messages before they're returned (`llm_runtime.redact`).
+- **You choose the lifetime.** *Remember on this device* persists the encrypted copy;
+  unchecked, the key lives in memory and dies with the tab. **Remove key** wipes both.
+- **Not prefilled back into the page.** Once saved, the dialog says a key exists rather
+  than re-rendering the secret into the DOM.
+
+The one thing browser storage can't defend against is script already executing on the
+page — no web app can. What it does guarantee is that the key is never at rest in a
+readable form.
+
+### Fair-use limits on the free engine
+
+The shared key is protected by three rolling windows, all configurable on the backend:
+`FREE_TIER_HOURLY_LIMIT` (default 150), `FREE_TIER_DAILY_LIMIT` (900), and
+`FREE_TIER_IP_HOURLY_LIMIT` (18, so one visitor can't drain the pool). When a limit is
+hit, requests return **429** with a message pointing at the BYO dialog, and
+`GET /api/health` reports the live status that drives the pill.
+
+---
+
 ## Architecture & tech stack
 
 **Frontend** — a static single-page app:
@@ -155,10 +219,14 @@ This project treats LLM tokens as a scarce resource and is engineered around min
 
 **Backend** — a stateless HTTP API:
 - Python + FastAPI (with Server-Sent Events for streaming the pipeline)
-- Google Gemini via the `google-genai` SDK (free tier; web-search grounding)
+- Ten LLM providers behind one interface — Gemini via `google-genai`, everything else over
+  plain HTTPS with `httpx`, plus `boto3` for AWS SigV4
 - pypdf for document text extraction
 
-The frontend talks to the backend over a small REST/SSE API. The backend holds the only secret (the model API key) and is the single integration point with the LLM provider — swapping models or providers touches only `agents/llm_client.py`.
+The frontend talks to the backend over a small REST/SSE API. The backend is stateless and
+holds no user secrets: credentials arrive with each request, live in a `ContextVar` for its
+duration, and are gone when the response ends. All provider-specific wire formats live in
+`llm_providers.py`, so the agents and orchestrator never know which model they're talking to.
 
 ---
 
@@ -169,12 +237,14 @@ ArchAItect/
 ├── backend/
 │   ├── main.py                  # FastAPI app + HTTP/SSE endpoints
 │   ├── orchestrator.py          # Runs the pipeline; on-demand analysis helpers
+│   ├── llm_providers.py         # Provider catalog + per-vendor wire formats
+│   ├── llm_runtime.py           # Per-request credentials, redaction, free-tier gate
 │   ├── preprocess.py            # Document compression (pure Python, 0 tokens)
 │   ├── resilience.py            # Blast-radius simulation (pure Python, 0 tokens)
 │   ├── metrics.py               # Cohesion/coupling/scalability/DDD (pure Python, 0 tokens)
 │   ├── requirements.txt
 │   └── agents/
-│       ├── llm_client.py        # The single LLM integration point (provider-agnostic)
+│       ├── llm_client.py        # Retry, fallback, JSON extraction (provider-agnostic)
 │       ├── _payload.py          # Slims payloads passed between agents
 │       ├── domain_agent.py      # Extracts the domain model
 │       ├── decompose_agent.py   # Proposes the services
@@ -187,9 +257,13 @@ ArchAItect/
 └── frontend/
     └── src/
         ├── App.tsx              # Orchestrates the whole UI
-        ├── lib/api.ts           # Typed client for the backend
+        ├── lib/
+        │   ├── api.ts           # Typed client for the backend
+        │   ├── config.ts        # API base URL
+        │   ├── keyvault.ts      # AES-GCM encrypted key storage in the browser
+        │   └── llm.ts           # Engine store: provider, model, free-tier status
         ├── types/architecture.ts
-        └── components/          # Map, panels, editor, tooltips, etc.
+        └── components/          # Map, panels, editor, engine dialog, tooltips, etc.
 ```
 
 ---
@@ -242,7 +316,9 @@ Open the URL Vite prints (usually <http://localhost:5173>). The header shows a l
 
 ## How to use the app
 
-1. **Welcome screen** → click **Let's go**.
+1. **Welcome screen** → click **Let's go**. A callout points at the **engine pill** in the
+   header for 10 seconds (dismissable) — that's where you add your own LLM key. See
+   [Bring your own key](#bring-your-own-key-byo).
 2. **Paste** a requirements document (or **Load Sample**, or upload a `.pdf` / `.txt` / `.md`) and click **Identify Microservices**.
 3. The page generates and scrolls to the **Service Map** (left) with the **Resilience** lens already populated (free).
 4. Use the **lens bar** to switch views. The map stays pinned on the left as your constant reference:
@@ -260,7 +336,11 @@ Every metric and term has an **ℹ️** you can hover for a plain-English defini
 ArchAItect is **two pieces with different needs**, so the honest answer is a **split deployment**:
 
 - The **frontend** is just static files → any static host works.
-- The **backend** runs Python, holds your secret API key, and streams responses → it needs a real server process. **This is why GitHub Pages alone is not enough** — Pages only serves static files; it can't run Python or safely hold your Gemini key. (If you put the key in the frontend, anyone could read it and drain your quota.)
+- The **backend** runs Python, holds the shared free-tier key, and streams responses → it needs a real server process. **This is why GitHub Pages alone is not enough** — Pages only serves static files; it can't run Python or safely hold your Gemini key. (If you put the key in the frontend, anyone could read it and drain your quota.)
+
+> A visitor's **own** key is different: it never touches the server's environment. It's
+> encrypted in their browser and passed through per request. See
+> [Bring your own key](#bring-your-own-key-byo).
 
 ### Recommended free setup
 
@@ -271,6 +351,10 @@ ArchAItect is **two pieces with different needs**, so the honest answer is a **s
 4. Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
 5. Add environment variables: `GEMINI_API_KEY`, `MODEL`, and `CORS_ORIGINS` (set this to your frontend URL, e.g. `https://your-app.vercel.app`).
 6. Note the service URL Render gives you (e.g. `https://archaitect-api.onrender.com`).
+
+> `GEMINI_API_KEY` is now **optional** — it only powers the free phiUture engine. Leave it
+> unset and the app still works: the free option reports itself as unconfigured and
+> visitors bring their own key.
 
 > Free instances sleep when idle, so the **first request after a pause takes ~30–60s to wake**. Fine for a demo; mention it if you're presenting live.
 
@@ -288,12 +372,18 @@ You *can* host the **frontend** on GitHub Pages (build with `npm run build`, pub
 
 These are already wired in so the same code runs locally and in production:
 
-| Where | Variable | Purpose |
-|---|---|---|
-| Frontend build | `VITE_API_BASE` | Points the app at your deployed backend (defaults to `http://localhost:8000`). |
-| Backend env | `GEMINI_API_KEY` | Your model key (kept server-side, never shipped to the browser). |
-| Backend env | `CORS_ORIGINS` | Comma-separated list of allowed frontend origins. |
-| Backend env | `MODEL` / `FALLBACK_MODEL` | Which Gemini models to use. |
+| Where | Variable | Required | Purpose |
+|---|---|---|---|
+| Frontend build | `VITE_API_BASE` | Yes in prod | Points the app at your deployed backend (defaults to `http://localhost:8000`). |
+| Backend env | `CORS_ORIGINS` | Yes in prod | Comma-separated list of allowed frontend origins. |
+| Backend env | `GEMINI_API_KEY` | Optional | Powers the free phiUture engine. Unset ⇒ visitors must bring their own key. |
+| Backend env | `MODEL` / `FALLBACK_MODEL` | Optional | Which Gemini models the free engine uses. |
+| Backend env | `FREE_TIER_HOURLY_LIMIT` | Optional | Shared-key calls per hour, all visitors (default `150`). |
+| Backend env | `FREE_TIER_DAILY_LIMIT` | Optional | Shared-key calls per day (default `900`). |
+| Backend env | `FREE_TIER_IP_HOURLY_LIMIT` | Optional | Shared-key calls per visitor per hour (default `18`). |
+
+No environment variable is ever needed for a visitor's own key — that's supplied by the
+browser per request, so BYO works on a fresh deploy with nothing configured.
 
 ---
 

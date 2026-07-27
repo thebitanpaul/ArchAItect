@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Download, ShieldAlert, Zap, GitBranch, Search, Pencil, Loader2, Info, ArrowDown, Gauge, GitMerge,
+  KeyRound,
 } from "lucide-react";
 import {
   analyzeStream, fetchReview, fetchRoadmap, fetchCompetitor, fetchTraceability, recomputeArch, applyFix,
@@ -22,9 +23,11 @@ import MetricsPanel from "@/components/MetricsPanel";
 import TraceabilityPanel from "@/components/TraceabilityPanel";
 import ResultsSkeleton from "@/components/ResultsSkeleton";
 import InfoDot from "@/components/InfoDot";
+import EnginePill, { type BackendState } from "@/components/EnginePill";
+import EngineSettings from "@/components/EngineSettings";
+import { initEngine, refreshHealth } from "@/lib/llm";
 
 type StepStatus = "pending" | "running" | "done";
-type BackendState = "checking" | "online" | "offline";
 type Lens = "edit" | "resilience" | "metrics" | "review" | "roadmap" | "traceability" | "competitor";
 
 function initialStatuses(): Record<string, StepStatus> {
@@ -56,6 +59,7 @@ export default function App() {
   const [prevLensIdx, setPrevLensIdx] = useState(1);
   const [highlight, setHighlight] = useState<{ source: string; set: string[] } | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [engineOpen, setEngineOpen] = useState(false);
   const [changeNote, setChangeNote] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const appRef = useRef<HTMLDivElement>(null);
@@ -72,12 +76,18 @@ export default function App() {
     }
   }, [arch]);
 
+  // Load saved engine settings (provider + encrypted key) and probe the backend.
+  // Health is re-checked after each analysis because free-engine availability is a
+  // function of live traffic, so the pill can go amber without a page reload.
   useEffect(() => {
     let alive = true;
-    fetch(`${import.meta.env.VITE_API_BASE ?? "http://localhost:8000"}/api/health`)
-      .then((r) => (r.ok ? setBackend("online") : setBackend("offline")))
-      .catch(() => alive && setBackend("offline"));
+    initEngine();
+    refreshHealth().then((s) => alive && setBackend(s));
     return () => { alive = false; };
+  }, []);
+
+  const checkHealth = useCallback(() => {
+    refreshHealth().then(setBackend);
   }, []);
 
   const selectedService = useMemo(
@@ -129,6 +139,7 @@ export default function App() {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setRunning(false);
+      checkHealth();
     }
   }
 
@@ -159,7 +170,7 @@ export default function App() {
         setArch((p) => p ? { ...p, competitor } : p);
       }
     } catch (e) { setError(e instanceof Error ? e.message : `${which} failed.`); }
-    finally { setBusy(null); }
+    finally { setBusy(null); checkHealth(); }
   }
 
   function onServicesChange(services: Service[]) {
@@ -277,16 +288,7 @@ export default function App() {
             </p>
           </div>
           <div className="ml-auto flex items-center gap-2.5">
-            <div className="flex items-center gap-2 rounded-lg px-3 py-1.5"
-              style={{ border: "1px solid var(--line)", background: "rgba(255,255,255,0.015)" }}>
-              <span className={backend === "online" ? "pulse" : ""}
-                style={{ width: 7, height: 7, borderRadius: 99,
-                  background: backend === "online" ? "var(--cyan)" : backend === "offline" ? "var(--rose)" : "var(--amber)",
-                  boxShadow: backend === "online" ? "0 0 8px var(--cyan)" : "none" }} />
-              <span className="font-mono text-[10px]" style={{ color: "var(--ink-dim)" }}>
-                {backend === "online" ? "engine online" : backend === "offline" ? "engine offline" : "connecting…"}
-              </span>
-            </div>
+            <EnginePill backend={backend} armHint={welcomed} onOpen={() => setEngineOpen(true)} />
             <button onClick={exportJson} disabled={!arch}
               className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-[10px] transition-colors"
               style={{ border: "1px solid var(--line)", color: arch ? "var(--cyan)" : "var(--ink-faint)",
@@ -304,8 +306,15 @@ export default function App() {
         </div>
 
         {error && (
-          <div className="panel mt-5 flex items-center justify-between p-4" style={{ borderColor: "var(--rose)" }}>
-            <span className="font-mono text-xs" style={{ color: "var(--rose)" }}>error: {error}</span>
+          <div className="panel mt-5 flex flex-wrap items-center gap-3 p-4" style={{ borderColor: "var(--rose)" }}>
+            <span className="min-w-0 flex-1 font-mono text-xs" style={{ color: "var(--rose)" }}>error: {error}</span>
+            {isKeyProblem(error) && (
+              <button onClick={() => { setError(null); setEngineOpen(true); }}
+                className="flex items-center gap-1.5 rounded-md px-3 py-1.5 font-mono text-[10px]"
+                style={{ background: "var(--amber)", color: "#1a1205", cursor: "pointer" }}>
+                <KeyRound size={11} /> use my own key
+              </button>
+            )}
             <button onClick={() => setError(null)} className="font-mono text-[10px]" style={{ color: "var(--ink-faint)", cursor: "pointer" }}>dismiss</button>
           </div>
         )}
@@ -511,8 +520,16 @@ export default function App() {
       </footer>
 
       <ServiceDrawer arch={arch ?? ({} as Architecture)} service={selectedService} onClose={() => setSelectedId(null)} />
+      <EngineSettings open={engineOpen} onClose={() => { setEngineOpen(false); checkHealth(); }} />
     </div>
   );
+}
+
+/** Errors the user can actually fix by supplying their own key. */
+function isKeyProblem(message: string): boolean {
+  const m = message.toLowerCase();
+  return ["api key", "quota", "rate limit", "busy", "credential", "engine settings",
+    "engine pill", "free phiuture"].some((s) => m.includes(s));
 }
 
 function Stat({ n, label, accent = "var(--cyan)" }: { n: number; label: string; accent?: string }) {

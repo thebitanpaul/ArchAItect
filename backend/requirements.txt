@@ -5,3 +5,9 @@ python-multipart==0.0.20
 pypdf==5.1.0
 python-dotenv==1.0.1
 pydantic==2.10.4
+# BYO-key providers: httpx talks to every OpenAI-compatible / Anthropic endpoint,
+# boto3 signs AWS Bedrock calls. Both are floating rather than pinned — httpx comes
+# in transitively via google-genai (a hard pin here can conflict on upgrade), and
+# boto3 ships a new patch release most weekdays.
+httpx>=0.27,<1
+boto3>=1.34
