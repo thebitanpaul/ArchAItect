@@ -6,7 +6,7 @@
 
 [![Live Demo](https://img.shields.io/badge/Live%20App-Open%20in%20Vercel-blue?style=for-the-badge&logo=vercel)](https://archaitect-ten.vercel.app)
 
-<img alt="Hero Image" src="https://res.cloudinary.com/b0tb1mho/image/upload/v1784626188/q8vgomhungoglex9axyk.webp"/>
+<img alt="Hero Image" src="https://res.cloudinary.com/b0tb1mho/image/upload/v1785177731/ArchAITect_Thumbnail.webp"/>
 
 **Turn a plain-English requirements document into a complete microservice architecture — a service map, an AI risk audit, a failure-resilience simulation, architecture metrics, a traceability matrix, a migration roadmap, and live competitor intelligence.**
 
@@ -18,8 +18,12 @@
 
 <div align="center">
 
-https://github.com/user-attachments/assets/20b3656f-5844-4289-9700-e4c1c3e3f12a
+#### Watch The Demo Video On YouTube:
 
+
+<a href="https://youtu.be/fFKH_kVNXpQ" target="_blank">
+<img src="https://img.youtube.com/vi/fFKH_kVNXpQ/hqdefault.jpg" width="1080"/>
+</a>
 
 ### Architecture Overview
 <img alt="Architecture Overview" src="https://res.cloudinary.com/b0tb1mho/image/upload/v1784579257/lad6w4g1ks2egche5luh.webp"/>
