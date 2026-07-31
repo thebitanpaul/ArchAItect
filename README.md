@@ -4,7 +4,7 @@
 
 ### Shape your business with AI
 
-[![Live Demo](https://img.shields.io/badge/Live%20App-Open%20in%20Vercel-blue?style=for-the-badge&logo=vercel)](https://archaitect-ten.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Open%20on-phiUture-000000?style=for-the-badge)](https://archaitect.phiuture.com)
 
 <img alt="Hero Image" src="https://res.cloudinary.com/b0tb1mho/image/upload/v1785177731/ArchAITect_Thumbnail.webp"/>
 
