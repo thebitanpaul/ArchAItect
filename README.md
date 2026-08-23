@@ -20,24 +20,27 @@
 
 #### Watch The Demo Video On YouTube:
 
-
 <a href="https://youtu.be/fFKH_kVNXpQ" target="_blank">
 <img src="https://img.youtube.com/vi/fFKH_kVNXpQ/hqdefault.jpg" width="1080"/>
 </a>
 
 ### Bring Your Own Key (BYO) with bank-grade security
+
 <img alt="Architecture Overview" src="https://res.cloudinary.com/b0tb1mho/image/upload/v1785179218/Screenshot_2026-07-28_at_12.36.34_AM.webp"/>
 
 ### Architecture Overview
+
 <img alt="Architecture Overview" src="https://res.cloudinary.com/b0tb1mho/image/upload/v1784579257/lad6w4g1ks2egche5luh.webp"/>
 
 ### Cohesion · Coupling · Scalability · DDD
+
 <img alt="Cohesion · Coupling · Scalability · DDD" src="https://res.cloudinary.com/b0tb1mho/image/upload/v1784579254/ekgniehr6yzragge16kb.webp"/>
 
 ### Generated Service Map
+
 <img alt="Generated Service Map" src="https://res.cloudinary.com/b0tb1mho/image/upload/v1784579260/ussn9x2puahejiybfqf9.webp"/>
 
-*A full walkthrough of ArchAItect — from requirements document to a stress-tested microservice architecture.*
+_A full walkthrough of ArchAItect — from requirements document to a stress-tested microservice architecture._
 
 </div>
 
@@ -74,7 +77,7 @@ The guiding principle is **logic over LLM wherever possible**. Most of the heavy
 - **Software architects & senior engineers** — to get a fast, structured first draft of a decomposition and stress-test their own designs.
 - **Engineering teams & tech leads** — to align on service boundaries and migration sequencing from a shared, visual reference.
 - **Product & pre-sales teams** — to translate a client's requirements into a credible technical proposal, complete with how comparable companies architect similar systems.
-- **Students & learners** — to *see* Domain-Driven Design, coupling/cohesion, and resilience concepts applied to a real spec, each explained inline.
+- **Students & learners** — to _see_ Domain-Driven Design, coupling/cohesion, and resilience concepts applied to a real spec, each explained inline.
 
 You do **not** need to be a microservices expert to use it — every metric and term has an in-app "ℹ️" explanation describing what it means and exactly how it's computed.
 
@@ -84,15 +87,15 @@ You do **not** need to be a microservices expert to use it — every metric and 
 
 After you paste or upload a requirements document, ArchAItect generates:
 
-| Output | What it is | How it's computed |
-|---|---|---|
-| **Service Map** | An interactive graph of the proposed microservices and their dependencies (sync vs async). | 3 LLM calls (domain → decompose → dependencies) |
-| **Resilience Simulator** | Hover any service to simulate its failure; the map highlights the downstream "blast radius". Flags single points of failure. | Pure Python (graph traversal) — 0 tokens |
-| **Architecture Metrics** | Cohesion, coupling looseness, scalability, business-boundary quality, and a Domain-Driven Design view, per service. | Pure Python (graph formulas) — 0 tokens |
-| **Risk Audit** | A senior-architect-style critique: God services, chatty sync chains, single points of failure, with a health score and fix suggestions. | 1 LLM call (on demand) |
-| **Traceability Matrix** | Maps every requirement from the document to the service(s) that satisfy it; surfaces coverage gaps. | 1 LLM call (on demand) |
-| **Migration Roadmap** | A phased, strangler-fig delivery plan ordered by the dependency graph. | 1 LLM call (on demand) |
-| **Competitor Intelligence** | How a real company in the same domain is actually architected, using live web search. | 1 grounded LLM call (on demand) |
+| Output                      | What it is                                                                                                                              | How it's computed                               |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| **Service Map**             | An interactive graph of the proposed microservices and their dependencies (sync vs async).                                              | 3 LLM calls (domain → decompose → dependencies) |
+| **Resilience Simulator**    | Hover any service to simulate its failure; the map highlights the downstream "blast radius". Flags single points of failure.            | Pure Python (graph traversal) — 0 tokens        |
+| **Architecture Metrics**    | Cohesion, coupling looseness, scalability, business-boundary quality, and a Domain-Driven Design view, per service.                     | Pure Python (graph formulas) — 0 tokens         |
+| **Risk Audit**              | A senior-architect-style critique: God services, chatty sync chains, single points of failure, with a health score and fix suggestions. | 1 LLM call (on demand)                          |
+| **Traceability Matrix**     | Maps every requirement from the document to the service(s) that satisfy it; surfaces coverage gaps.                                     | 1 LLM call (on demand)                          |
+| **Migration Roadmap**       | A phased, strangler-fig delivery plan ordered by the dependency graph.                                                                  | 1 LLM call (on demand)                          |
+| **Competitor Intelligence** | How a real company in the same domain is actually architected, using live web search.                                                   | 1 grounded LLM call (on demand)                 |
 
 You can **edit the architecture by hand** at any point — add, rename, or delete services, wire new dependencies (and toggle them sync/async), change data stores, and add external integrations (payment gateways, auth providers, etc.). Editing is **free** (no tokens): the resilience and metrics recompute instantly in Python.
 
@@ -124,9 +127,10 @@ The pipeline is deliberately staged so that **the expensive steps run last and o
         └─────────────────────────────────────────────────────────────┘
 ```
 
-**Step 1 — Document compression (no AI).** Before a single token is spent, `preprocess.py` runs classic extractive summarization: it strips boilerplate (page numbers, tables of contents, legal/version headers), scores every sentence and heading by "requirement signal" (requirement keywords like *shall/must/manage*, domain nouns, structural cues), deduplicates, and keeps the densest content up to a character budget. A 250 KB document becomes a tight digest — and that digest is the *only* raw document text any model ever sees.
+**Step 1 — Document compression (no AI).** Before a single token is spent, `preprocess.py` runs classic extractive summarization: it strips boilerplate (page numbers, tables of contents, legal/version headers), scores every sentence and heading by "requirement signal" (requirement keywords like _shall/must/manage_, domain nouns, structural cues), deduplicates, and keeps the densest content up to a character budget. A 250 KB document becomes a tight digest — and that digest is the _only_ raw document text any model ever sees.
 
 **Step 2 — The required agents.** The digest flows through three focused agents, each a single LLM call returning strict JSON:
+
 - **Domain agent** — extracts actors, entities, and functional areas.
 - **Decompose agent** — proposes services with bounded contexts, responsibilities, data stores, and external integrations (applying polyglot persistence so stores genuinely vary).
 - **Dependency agent** — maps the edges between services (synchronous REST vs asynchronous events).
@@ -148,7 +152,7 @@ This project treats LLM tokens as a scarce resource and is engineered around min
 - **Token-free editing.** Manual edits recompute resilience and metrics in Python; no model call.
 - **Single grounded call** for competitor intel (search + structured output in one round trip).
 
-> **The one-line pitch:** *We don't blindly stuff documents into an LLM. We pre-process in pure Python and send only the distilled signal, then use the model surgically — only where reasoning is genuinely needed, and only on demand.*
+> **The one-line pitch:** _We don't blindly stuff documents into an LLM. We pre-process in pure Python and send only the distilled signal, then use the model surgically — only where reasoning is genuinely needed, and only on demand._
 
 ---
 
@@ -159,25 +163,25 @@ header (top right, the one showing `engine online`) and the engine dialog opens.
 
 **Two modes:**
 
-| Mode | What it is |
-|---|---|
+| Mode              | What it is                                                                                                                                                                                               |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **phiUture free** | A shared key hosted with the app — nothing to sign up for. Because it's shared, **availability depends on live traffic**: when it's saturated the pill turns amber and you're asked to add your own key. |
-| **Your own key** | Pick a provider, optionally pin a model, paste a key, click **Test key** to prove it works, then **Save & use**. Every analysis from then on runs through your account. |
+| **Your own key**  | Pick a provider, optionally pin a model, paste a key, click **Test key** to prove it works, then **Save & use**. Every analysis from then on runs through your account.                                  |
 
 **Supported providers** — each one links straight to its key page from the dialog:
 
-| Provider | Free tier? | Live web search |
-|---|---|---|
-| Google Gemini | Yes, no card needed | ✅ Google Search grounding |
-| Anthropic Claude | No | ✅ web search tool |
-| OpenAI GPT | No | — |
-| AWS Bedrock (Claude / Nova / Llama) | No | — |
-| Groq | Yes, generous | — |
-| Mistral AI | Yes, experimental | — |
-| OpenRouter | Some free models | — |
-| xAI Grok | No | — |
-| DeepSeek | No | — |
-| Custom (OpenAI-compatible) | Ollama, vLLM, LM Studio, an internal gateway… | — |
+| Provider                            | Free tier?                                    | Live web search            |
+| ----------------------------------- | --------------------------------------------- | -------------------------- |
+| Google Gemini                       | Yes, no card needed                           | ✅ Google Search grounding |
+| Anthropic Claude                    | No                                            | ✅ web search tool         |
+| OpenAI GPT                          | No                                            | —                          |
+| AWS Bedrock (Claude / Nova / Llama) | No                                            | —                          |
+| Groq                                | Yes, generous                                 | —                          |
+| Mistral AI                          | Yes, experimental                             | —                          |
+| OpenRouter                          | Some free models                              | —                          |
+| xAI Grok                            | No                                            | —                          |
+| DeepSeek                            | No                                            | —                          |
+| Custom (OpenAI-compatible)          | Ollama, vLLM, LM Studio, an internal gateway… | —                          |
 
 Providers without a search tool still produce Competitor Intelligence — the model is
 explicitly told it has no live lookup and to label its sources as public knowledge, so
@@ -196,7 +200,7 @@ whether it works.
 - **Nothing is stored server-side.** The backend uses the key for that one request and
   discards it: no logs, no database, no disk. Secrets are also stripped out of provider
   error messages before they're returned (`llm_runtime.redact`).
-- **You choose the lifetime.** *Remember on this device* persists the encrypted copy;
+- **You choose the lifetime.** _Remember on this device_ persists the encrypted copy;
   unchecked, the key lives in memory and dies with the tab. **Remove key** wipes both.
 - **Not prefilled back into the page.** Once saved, the dialog says a key exists rather
   than re-rendering the secret into the DOM.
@@ -218,6 +222,7 @@ hit, requests return **429** with a message pointing at the BYO dialog, and
 ## Architecture & tech stack
 
 **Frontend** — a static single-page app:
+
 - React + Vite + TypeScript
 - Tailwind CSS + shadcn/ui
 - React Flow (`@xyflow/react`) for the interactive service map
@@ -225,6 +230,7 @@ hit, requests return **429** with a message pointing at the BYO dialog, and
 - lucide-react for icons
 
 **Backend** — a stateless HTTP API:
+
 - Python + FastAPI (with Server-Sent Events for streaming the pipeline)
 - Ten LLM providers behind one interface — Gemini via `google-genai`, everything else over
   plain HTTPS with `httpx`, plus `boto3` for AWS SigV4
@@ -278,6 +284,7 @@ ArchAItect/
 ## Running it locally
 
 ### Prerequisites
+
 - **Node.js** 18+ and **Python** 3.10+
 - A **free Google Gemini API key** — get one (no credit card) at <https://aistudio.google.com/apikey>
 
@@ -352,6 +359,7 @@ ArchAItect is **two pieces with different needs**, so the honest answer is a **s
 ### Recommended free setup
 
 **Backend → [Render](https://render.com) free web service** (or Railway / Fly.io):
+
 1. Push this repo to GitHub.
 2. On Render: **New → Web Service**, point it at your repo, root directory `backend`.
 3. Build command: `pip install -r requirements.txt`
@@ -366,6 +374,7 @@ ArchAItect is **two pieces with different needs**, so the honest answer is a **s
 > Free instances sleep when idle, so the **first request after a pause takes ~30–60s to wake**. Fine for a demo; mention it if you're presenting live.
 
 **Frontend → [Vercel](https://vercel.com) or [Netlify](https://netlify.com) free tier** (recommended over GitHub Pages because env vars and SPA routing are easier):
+
 1. **New Project**, import the repo, set the root directory to `frontend`.
 2. Framework preset: **Vite**. Build: `npm run build`. Output: `dist`.
 3. Add an environment variable **`VITE_API_BASE`** = your Render backend URL.
@@ -373,21 +382,21 @@ ArchAItect is **two pieces with different needs**, so the honest answer is a **s
 
 ### Can I use GitHub Pages?
 
-You *can* host the **frontend** on GitHub Pages (build with `npm run build`, publish the `dist/` folder, and set `VITE_API_BASE` at build time), but you **still need a separate backend host** for the Python API and key. So Pages can be the frontend half of the split — it just can't be the whole thing.
+You _can_ host the **frontend** on GitHub Pages (build with `npm run build`, publish the `dist/` folder, and set `VITE_API_BASE` at build time), but you **still need a separate backend host** for the Python API and key. So Pages can be the frontend half of the split — it just can't be the whole thing.
 
 ### Configuration knobs that make deployment work
 
 These are already wired in so the same code runs locally and in production:
 
-| Where | Variable | Required | Purpose |
-|---|---|---|---|
-| Frontend build | `VITE_API_BASE` | Yes in prod | Points the app at your deployed backend (defaults to `http://localhost:8000`). |
-| Backend env | `CORS_ORIGINS` | Yes in prod | Comma-separated list of allowed frontend origins. |
-| Backend env | `GEMINI_API_KEY` | Optional | Powers the free phiUture engine. Unset ⇒ visitors must bring their own key. |
-| Backend env | `MODEL` / `FALLBACK_MODEL` | Optional | Which Gemini models the free engine uses. |
-| Backend env | `FREE_TIER_HOURLY_LIMIT` | Optional | Shared-key calls per hour, all visitors (default `150`). |
-| Backend env | `FREE_TIER_DAILY_LIMIT` | Optional | Shared-key calls per day (default `900`). |
-| Backend env | `FREE_TIER_IP_HOURLY_LIMIT` | Optional | Shared-key calls per visitor per hour (default `18`). |
+| Where          | Variable                    | Required    | Purpose                                                                        |
+| -------------- | --------------------------- | ----------- | ------------------------------------------------------------------------------ |
+| Frontend build | `VITE_API_BASE`             | Yes in prod | Points the app at your deployed backend (defaults to `http://localhost:8000`). |
+| Backend env    | `CORS_ORIGINS`              | Yes in prod | Comma-separated list of allowed frontend origins.                              |
+| Backend env    | `GEMINI_API_KEY`            | Optional    | Powers the free phiUture engine. Unset ⇒ visitors must bring their own key.    |
+| Backend env    | `MODEL` / `FALLBACK_MODEL`  | Optional    | Which Gemini models the free engine uses.                                      |
+| Backend env    | `FREE_TIER_HOURLY_LIMIT`    | Optional    | Shared-key calls per hour, all visitors (default `150`).                       |
+| Backend env    | `FREE_TIER_DAILY_LIMIT`     | Optional    | Shared-key calls per day (default `900`).                                      |
+| Backend env    | `FREE_TIER_IP_HOURLY_LIMIT` | Optional    | Shared-key calls per visitor per hour (default `18`).                          |
 
 No environment variable is ever needed for a visitor's own key — that's supplied by the
 browser per request, so BYO works on a fresh deploy with nothing configured.
@@ -401,7 +410,7 @@ browser per request, so BYO works on a fresh deploy with nothing configured.
 - **Functional area** — a capability bucket (e.g. Ordering, Payments).
 - **Bounded context** — a self-contained business zone that one service owns (Domain-Driven Design).
 - **Responsibility** — the single job a service does.
-- **Sync (REST)** — a service calls another and *waits* for the reply (like a phone call).
+- **Sync (REST)** — a service calls another and _waits_ for the reply (like a phone call).
 - **Async (events)** — a service fires an event and moves on; others react later (like a text message).
 - **Cohesion** — how focused a service is on one job.
 - **Coupling** — how dependent services are on one another (fan-in = who depends on it; fan-out = what it depends on).
@@ -427,7 +436,6 @@ See the LICENSE file for full license text.
 
 ## About phiUture
 
-
 Welcome to phiUture — Beautiful Technology. Centered Around You. Shaping Tomorrow.
 
 Inspired by the Golden Ratio (φ), our name represents beautiful, intelligent engineering, while the "U" stands for You—placing people at the center of every solution we build.
@@ -445,16 +453,15 @@ Here you'll find:
 • Tutorials, experiments, and future innovations
 ```
 
-| Personal | Business | Artist |
-|----------|----------|--------|
-| [![GitHub](https://img.shields.io/badge/GitHub-thebitanpaul-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/thebitanpaul) | [![Website](https://img.shields.io/badge/Website-phiUture-000000?style=for-the-badge&logo=googlechrome&logoColor=white)](https://phiuture.com) | [![YouTube](https://img.shields.io/badge/YouTube-thebitanpaul-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@thebitanpaul) |
-| [![LinkedIn](https://img.shields.io/badge/LinkedIn-thebitanpaul-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/thebitanpaul) | [![YouTube](https://img.shields.io/badge/YouTube-phiUture-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@phiuture) | [![Spotify](https://img.shields.io/badge/Spotify-1DB954?style=for-the-badge&logo=spotify&logoColor=white)](https://open.spotify.com/artist/6ghDcCBlKzJIgm3e586jpV) |
-| [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://instagram.com/thebitanpaul) | [![Google Play](https://img.shields.io/badge/Google_Play-Developer-34A853?style=for-the-badge&logo=googleplay&logoColor=white)](https://play.google.com/store/apps/dev?id=6358474525178045834&hl=en) | [![YouTube Music](https://img.shields.io/badge/YouTube_Music-FF0000?style=for-the-badge&logo=youtubemusic&logoColor=white)](https://music.youtube.com/playlist?list=OLAK5uy_km3cjEB2zl59Etcgv9UBKWw800O9G3NdE) |
-| [![Facebook](https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white)](https://facebook.com/thebitanpaul) | [![Email](https://img.shields.io/badge/Business_Email-thephiuture%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:thephiuture@gmail.com) | [![Amazon Music](https://img.shields.io/badge/Amazon_Music-46C3D0?style=for-the-badge&logo=amazonmusic&logoColor=white)](https://music.amazon.com/albums/B0G52QMYDC) |
-| [![X](https://img.shields.io/badge/X-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/thebitanpaul_) |  | [![Apple Music](https://img.shields.io/badge/Apple_Music-FA243C?style=for-the-badge&logo=applemusic&logoColor=white)](https://music.apple.com/us/artist/thebitanpaul/1858534880) |
-| [![Snapchat](https://img.shields.io/badge/Snapchat-FFFC00?style=for-the-badge&logo=snapchat&logoColor=000000)](https://snapchat.com/t/UgO0Iywr) |  | [![JioSaavn](https://img.shields.io/badge/JioSaavn-2BC5B4?style=for-the-badge&logo=jiosaavn&logoColor=white)](https://www.jiosaavn.com/artist/thebitanpaul-songs/zuo0NgC65gQ_) |
-| [![Email](https://img.shields.io/badge/Personal_Email-thebitanpaul%40gmail.com-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:thebitanpaul@gmail.com) |  |  |
-
+| Personal                                                                                                                                                              | Business                                                                                                                                                                                             | Artist                                                                                                                                                                                                         |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [![GitHub](https://img.shields.io/badge/GitHub-thebitanpaul-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/thebitanpaul)                 | [![Website](https://img.shields.io/badge/Website-phiUture-000000?style=for-the-badge&logo=googlechrome&logoColor=white)](https://phiuture.com)                                                       | [![YouTube](https://img.shields.io/badge/YouTube-thebitanpaul-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@thebitanpaul)                                                 |
+| [![LinkedIn](https://img.shields.io/badge/LinkedIn-thebitanpaul-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/thebitanpaul)      | [![YouTube](https://img.shields.io/badge/YouTube-phiUture-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@phiuture)                                               | [![Spotify](https://img.shields.io/badge/Spotify-1DB954?style=for-the-badge&logo=spotify&logoColor=white)](https://open.spotify.com/artist/6ghDcCBlKzJIgm3e586jpV)                                             |
+| [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://instagram.com/thebitanpaul)                  | [![Google Play](https://img.shields.io/badge/Google_Play-Developer-34A853?style=for-the-badge&logo=googleplay&logoColor=white)](https://play.google.com/store/apps/dev?id=6358474525178045834&hl=en) | [![YouTube Music](https://img.shields.io/badge/YouTube_Music-FF0000?style=for-the-badge&logo=youtubemusic&logoColor=white)](https://music.youtube.com/playlist?list=OLAK5uy_km3cjEB2zl59Etcgv9UBKWw800O9G3NdE) |
+| [![Facebook](https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white)](https://facebook.com/thebitanpaul)                      | [![Email](https://img.shields.io/badge/Business_Email-thephiuture%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:thephiuture@gmail.com)                                  | [![Amazon Music](https://img.shields.io/badge/Amazon_Music-46C3D0?style=for-the-badge&logo=amazonmusic&logoColor=white)](https://music.amazon.com/albums/B0G52QMYDC)                                           |
+| [![X](https://img.shields.io/badge/X-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/thebitanpaul_)                                                 |                                                                                                                                                                                                      | [![Apple Music](https://img.shields.io/badge/Apple_Music-FA243C?style=for-the-badge&logo=applemusic&logoColor=white)](https://music.apple.com/us/artist/thebitanpaul/1858534880)                               |
+| [![Snapchat](https://img.shields.io/badge/Snapchat-FFFC00?style=for-the-badge&logo=snapchat&logoColor=000000)](https://snapchat.com/t/UgO0Iywr)                       |                                                                                                                                                                                                      | [![JioSaavn](https://img.shields.io/badge/JioSaavn-2BC5B4?style=for-the-badge&logo=jiosaavn&logoColor=white)](https://www.jiosaavn.com/artist/thebitanpaul-songs/zuo0NgC65gQ_)                                 |
+| [![Email](https://img.shields.io/badge/Personal_Email-thebitanpaul%40gmail.com-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:thebitanpaul@gmail.com) |                                                                                                                                                                                                      |                                                                                                                                                                                                                |
 
 <div align="center">
 
